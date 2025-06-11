@@ -437,15 +437,25 @@ class FileUpload {
             }
             
         } catch (error) {
-            console.error('File processing error:', error);
+            console.error('File processing error:', {
+                file: file ? file.name : 'unknown',
+                message: error.message,
+                stack: error.stack
+            });
+
             window.TeamAnalyzer.showNotification(
                 `Error processing ${file.name}: ${error.message}`,
                 'error',
                 8000
             );
+
             window.TeamAnalyzer.handleError(error, 'File Upload', {
                 category: 'file_processing',
-                severity: 'high'
+                severity: 'high',
+                details: {
+                    fileName: file ? file.name : 'unknown',
+                    stack: error.stack
+                }
             });
             this.resetUpload();
         }
