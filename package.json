@@ -1,0 +1,21 @@
+{
+  "name": "team-analyzer",
+  "version": "1.0.0",
+  "description": "Browser-based tool for managers to analyze team compensation and make salary decisions",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "npx http-server . -p 3000 -o",
+    "dev": "npx http-server . -p 3000 -o -c-1",
+    "test": "echo \"No tests specified yet\" && exit 0"
+  },
+  "keywords": ["compensation", "salary", "team-management", "csv-analysis"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+} 

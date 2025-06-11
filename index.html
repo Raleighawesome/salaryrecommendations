@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Analyzer - Salary Decision Tool</title>
+    <meta name="description" content="Browser-based tool for managers to analyze team compensation and make informed salary decisions">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="src/styles/main.css">
+    
+    <!-- Favicon (placeholder) -->
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,">
+</head>
+<body>
+    <!-- Main Application Container -->
+    <div id="app" class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1>Team Analyzer</h1>
+            <p class="app-subtitle">Make informed salary decisions for your team</p>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- File Upload Section -->
+            <section id="upload-section" class="section">
+                <h2>Upload Team Data</h2>
+                <div id="file-upload-container">
+                    <!-- File upload component will be rendered here -->
+                </div>
+            </section>
+
+            <!-- Data Analysis Section (initially hidden) -->
+            <section id="analysis-section" class="section hidden">
+                <div class="tabs-container">
+                    <nav class="tabs-nav">
+                        <button class="tab-button active" data-tab="table">Team Data</button>
+                        <button class="tab-button" data-tab="raises">Raise Settings</button>
+                        <button class="tab-button" data-tab="recommendations">Recommendations</button>
+                        <button class="tab-button" data-tab="insights">Insights</button>
+                        <button class="tab-button" data-tab="visualizations">Charts</button>
+                        <button class="tab-button" data-tab="export">Export</button>
+                    </nav>
+
+                    <!-- Tab Content Areas -->
+                    <div class="tab-content">
+                        <div id="table-tab" class="tab-panel active">
+                            <div id="duplicate-merger-container">
+                                <!-- Duplicate merger interface will be rendered here -->
+                            </div>
+                            <div id="performance-suggester-container">
+                                <!-- Performance suggester interface will be rendered here -->
+                            </div>
+                            <div class="table-layout">
+                                <div class="table-sidebar">
+                                    <div id="search-bar-container">
+                                        <!-- Search bar will be rendered here -->
+                                    </div>
+                                    <div id="filter-panel-container">
+                                        <!-- Filter panel will be rendered here -->
+                                    </div>
+                                </div>
+                                <div id="data-table-container" style="height: 600px;">
+                                    <!-- Employee data table will be rendered here -->
+                                </div>
+                            </div>
+                        </div>
+                        <div id="raises-tab" class="tab-panel">
+                            <!-- Raise settings will be rendered here -->
+                        </div>
+                        <div id="recommendations-tab" class="tab-panel">
+                            <!-- Recommendations will be rendered here -->
+                        </div>
+                        <div id="insights-tab" class="tab-panel">
+                            <!-- Insights will be rendered here -->
+                        </div>
+                        <div id="visualizations-tab" class="tab-panel">
+                            <!-- Charts and visualizations will be rendered here -->
+                        </div>
+                        <div id="export-tab" class="tab-panel">
+                            <!-- Export options will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>All data processing occurs locally in your browser - no data is transmitted to external servers</p>
+        </footer>
+    </div>
+
+    <!-- Error/Notification Container -->
+    <div id="notifications" class="notifications-container"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Processing your data...</p>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="src/utils/errorHandler.js"></script>
+    <script src="src/utils/notificationSystem.js"></script>
+    <script src="src/utils/dataIntegrityChecker.js"></script>
+    <script src="src/utils/browserCompatibility.js"></script>
+    <script src="src/utils/exportManager.js"></script>
+    <script src="src/components/ExportInterface.js"></script>
+    <script src="src/components/HelpSystem.js"></script>
+    <script src="src/utils/testingFramework.js"></script>
+    <script src="src/main.js" type="module"></script>
+</body>
+</html> 

@@ -1,0 +1,589 @@
+/**
+ * Performance Analysis Component Styles
+ * 
+ * Professional styling for performance vs compensation analysis
+ */
+
+.performance-analysis {
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.analysis-header {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.analysis-header h2 {
+    color: #2c3e50;
+    margin-bottom: 8px;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.analysis-header p {
+    color: #7f8c8d;
+    font-size: 16px;
+    margin: 0;
+}
+
+/* Controls Section */
+.analysis-controls {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    border: 1px solid #e9ecef;
+}
+
+.controls-row {
+    display: flex;
+    gap: 20px;
+    align-items: end;
+    flex-wrap: wrap;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 150px;
+}
+
+.control-group label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.control-group select {
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background: white;
+    font-size: 14px;
+    color: #495057;
+    transition: border-color 0.2s ease;
+}
+
+.control-group select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Correlation Summary */
+.correlation-summary {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    border: 1px solid #e9ecef;
+}
+
+.correlation-summary h3 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.correlation-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.correlation-card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.correlation-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.correlation-card h4 {
+    color: #495057;
+    margin-bottom: 15px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.correlation-value {
+    display: block;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    padding: 10px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.correlation-value.strong-correlation {
+    background: #d4edda;
+    color: #155724;
+}
+
+.correlation-value.moderate-correlation {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.correlation-value.weak-correlation {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.correlation-strength {
+    font-size: 12px;
+    color: #6c757d;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Analysis Charts */
+.analysis-charts {
+    margin-bottom: 30px;
+}
+
+.chart-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 25px;
+    margin-bottom: 25px;
+}
+
+.chart-row.full-width {
+    grid-template-columns: 1fr;
+}
+
+.chart-card {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.2s ease;
+}
+
+.chart-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.chart-card h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 18px;
+    font-weight: 600;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 10px;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    margin-bottom: 15px;
+}
+
+.chart-container canvas {
+    max-width: 100%;
+    height: 100%;
+}
+
+/* Chart Insights */
+.chart-insights {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+}
+
+.insights-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+}
+
+.insight-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.insight-label {
+    font-size: 12px;
+    color: #6c757d;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.insight-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.insight-value.positive {
+    color: #28a745;
+}
+
+.insight-value.negative {
+    color: #dc3545;
+}
+
+.insight-value.neutral {
+    color: #6c757d;
+}
+
+/* Correlation Details */
+.correlation-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.correlation-data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.correlation-data-table th,
+.correlation-data-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.correlation-data-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #495057;
+    border-top: 1px solid #dee2e6;
+}
+
+.correlation-data-table tr:hover {
+    background: #f8f9fa;
+}
+
+.correlation-data-table .strong-correlation {
+    background: #d4edda;
+    color: #155724;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.correlation-data-table .moderate-correlation {
+    background: #fff3cd;
+    color: #856404;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.correlation-data-table .weak-correlation {
+    background: #f8d7da;
+    color: #721c24;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+/* Outlier Analysis */
+.outlier-analysis h4 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.outlier-summary {
+    background: #e9ecef;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+.outlier-summary p {
+    margin: 0;
+    color: #495057;
+    font-size: 14px;
+}
+
+.outlier-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.outlier-item {
+    background: white;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    border-left: 4px solid #ffc107;
+}
+
+.outlier-name {
+    font-weight: 600;
+    color: #2c3e50;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.outlier-details {
+    font-size: 13px;
+    color: #6c757d;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.outlier-reason {
+    font-size: 12px;
+    color: #856404;
+    font-style: italic;
+}
+
+.outlier-more {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    margin-top: 10px;
+}
+
+/* Performance Insights */
+.performance-insights {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.performance-insights h3 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 22px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.insights-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.recommendation-card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    border-left: 4px solid #007bff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.recommendation-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.recommendation-card.success {
+    border-left-color: #28a745;
+}
+
+.recommendation-card.warning {
+    border-left-color: #ffc107;
+}
+
+.recommendation-card.info {
+    border-left-color: #17a2b8;
+}
+
+.recommendation-card h4 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.recommendation-card p {
+    color: #495057;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.recommendation-action {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+}
+
+.recommendation-action strong {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .chart-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .controls-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .control-group {
+        min-width: auto;
+    }
+    
+    .correlation-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .correlation-details {
+        grid-template-columns: 1fr;
+    }
+    
+    .insights-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .chart-container {
+        height: 250px;
+    }
+    
+    .correlation-value {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .performance-analysis {
+        padding: 15px;
+    }
+    
+    .chart-card {
+        padding: 15px;
+    }
+    
+    .correlation-summary {
+        padding: 20px;
+    }
+    
+    .performance-insights {
+        padding: 20px;
+    }
+    
+    .correlation-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .insights-summary {
+        grid-template-columns: 1fr;
+    }
+    
+    .chart-container {
+        height: 200px;
+    }
+    
+    .correlation-value {
+        font-size: 20px;
+    }
+}
+
+/* Animation for chart loading */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.chart-card {
+    animation: slideInUp 0.6s ease-out;
+}
+
+.chart-card:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.chart-card:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+.chart-card:nth-child(4) {
+    animation-delay: 0.3s;
+}
+
+.correlation-card {
+    animation: slideInUp 0.5s ease-out;
+}
+
+.correlation-card:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.correlation-card:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+.correlation-card:nth-child(4) {
+    animation-delay: 0.3s;
+}
+
+/* Loading state for charts */
+.chart-container.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+}
+
+.chart-container.loading::before {
+    content: "Loading analysis...";
+    color: #6c757d;
+    font-size: 14px;
+}
+
+/* Print styles */
+@media print {
+    .analysis-controls {
+        display: none;
+    }
+    
+    .chart-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+    
+    .chart-container {
+        height: 250px;
+    }
+    
+    .recommendation-card {
+        break-inside: avoid;
+    }
+} 
