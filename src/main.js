@@ -571,9 +571,19 @@ async function handleFileProcessed(file, content) {
             await loadCSVParser();
         }
         
-        // Parse CSV content
+        // Parse CSV content with verbose error handling
         const parser = new CSVParser();
-        const parsedData = await parser.parseCSV(content);
+        let parsedData;
+        try {
+            parsedData = await parser.parseCSV(content);
+        } catch (parseError) {
+            const firstErrors = parser.parseErrors && parser.parseErrors.length > 0 ?
+                ` Errors: ${parser.parseErrors.slice(0, 3).join('; ')}${parser.parseErrors.length > 3 ? '...' : ''}` : '';
+            const message = `Failed to parse ${file.name}. ${parseError.message}.${firstErrors}`;
+            showNotification(message, 'error', 10000);
+            handleError(parseError, 'CSV Parsing', { category: 'file_processing', severity: 'high' });
+            return;
+        }
         
         // Load data validator and detect duplicates
         if (!window.DataValidator) {
@@ -738,7 +748,7 @@ async function handleFileProcessed(file, content) {
         
     } catch (error) {
         setLoading(false);
-        handleError(error, 'CSV Parsing');
+        handleError(error, 'CSV Parsing', { category: 'file_processing', severity: 'high' });
     }
 }
 

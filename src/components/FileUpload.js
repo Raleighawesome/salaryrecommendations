@@ -438,7 +438,15 @@ class FileUpload {
             
         } catch (error) {
             console.error('File processing error:', error);
-            window.TeamAnalyzer.handleError(error, 'File Upload');
+            window.TeamAnalyzer.showNotification(
+                `Error processing ${file.name}: ${error.message}`,
+                'error',
+                8000
+            );
+            window.TeamAnalyzer.handleError(error, 'File Upload', {
+                category: 'file_processing',
+                severity: 'high'
+            });
             this.resetUpload();
         }
     }
