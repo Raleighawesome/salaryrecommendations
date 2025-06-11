@@ -3,7 +3,7 @@
  * Provides interface for viewing and editing performance rating suggestions
  */
 
-class PerformanceSuggester {
+class PerformanceSuggesterComponent {
     constructor() {
         this.container = null;
         this.suggestions = [];
@@ -451,4 +451,4 @@ class PerformanceSuggester {
 }
 
 // Export for use in other modules
-window.PerformanceSuggester = PerformanceSuggester; 
+window.PerformanceSuggesterComponent = PerformanceSuggesterComponent;
