@@ -581,7 +581,12 @@ async function handleFileProcessed(file, content) {
                 ` Errors: ${parser.parseErrors.slice(0, 3).join('; ')}${parser.parseErrors.length > 3 ? '...' : ''}` : '';
             const message = `Failed to parse ${file.name}. ${parseError.message}.${firstErrors}`;
             showNotification(message, 'error', 10000);
-            handleError(parseError, 'CSV Parsing', { category: 'file_processing', severity: 'high' });
+            handleError(parseError, 'CSV Parsing', {
+                category: 'file_processing',
+                severity: 'high',
+                showNotification: false,
+                details: parser.parseErrors
+            });
             return;
         }
         
