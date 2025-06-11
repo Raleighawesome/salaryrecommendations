@@ -753,7 +753,26 @@ async function handleFileProcessed(file, content) {
         
     } catch (error) {
         setLoading(false);
-        handleError(error, 'CSV Parsing', { category: 'file_processing', severity: 'high' });
+        console.error('Post-upload processing error:', {
+            file: file ? file.name : 'unknown',
+            message: error.message,
+            stack: error.stack
+        });
+
+        showNotification(
+            `Error processing ${file.name}: ${error.message}`,
+            'error',
+            10000
+        );
+
+        handleError(error, 'CSV Parsing', {
+            category: 'file_processing',
+            severity: 'high',
+            details: {
+                fileName: file ? file.name : 'unknown',
+                stack: error.stack
+            }
+        });
     }
 }
 
