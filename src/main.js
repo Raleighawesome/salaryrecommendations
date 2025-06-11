@@ -515,7 +515,7 @@ function initializeDataTable() {
             // Initialize performance suggester
             const performanceSuggesterContainer = document.getElementById('performance-suggester-container');
             if (performanceSuggesterContainer) {
-                const performanceSuggesterComponent = new PerformanceSuggester();
+                const performanceSuggesterComponent = new PerformanceSuggesterComponent();
                 performanceSuggesterComponent.init(
                     performanceSuggesterContainer,
                     [],
