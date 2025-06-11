@@ -56,6 +56,8 @@ A comprehensive web-based application for analyzing employee data, planning sala
 
 Your CSV file should include the following columns:
 
+*The parser automatically detects commas, semicolons, or tabs as the delimiter.*
+
 ### Required Columns
 - `id`: Unique employee identifier
 - `name`: Employee full name
