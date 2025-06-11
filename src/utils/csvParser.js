@@ -42,6 +42,9 @@ class CSVParser {
 
         this.parseErrors = [];
         this.parseWarnings = [];
+
+        // Delimiter used for parsing, default to comma
+        this.delimiter = ',';
     }
 
     /**
@@ -56,13 +59,16 @@ class CSVParser {
 
             // Split into lines and handle different line endings
             const lines = csvContent.split(/\r?\n/).filter(line => line.trim());
+
+            // Detect delimiter from header row (supports comma, semicolon, tab)
+            this.delimiter = this.detectDelimiter(lines[0]);
             
             if (lines.length < 2) {
                 throw new Error('CSV file must contain at least a header row and one data row');
             }
 
             // Parse header row
-            const headers = this.parseCSVRow(lines[0]);
+            const headers = this.parseCSVRow(lines[0], this.delimiter);
             console.log('CSV headers found:', headers);
             
             const columnMapping = this.mapColumns(headers);
@@ -75,7 +81,7 @@ class CSVParser {
             const employees = [];
             for (let i = 1; i < lines.length; i++) {
                 try {
-                    const rowData = this.parseCSVRow(lines[i]);
+                    const rowData = this.parseCSVRow(lines[i], this.delimiter);
                     if (rowData.length === 0 || rowData.every(cell => !cell.trim())) {
                         continue; // Skip empty rows
                     }
@@ -116,11 +122,32 @@ class CSVParser {
     }
 
     /**
+     * Detect the delimiter used in a CSV line
+     * @param {string} line - Header line of the CSV
+     * @returns {string} Detected delimiter (default ',')
+     */
+    detectDelimiter(line) {
+        const commaCount = (line.match(/,/g) || []).length;
+        const semicolonCount = (line.match(/;/g) || []).length;
+        const tabCount = (line.match(/\t/g) || []).length;
+
+        if (semicolonCount > commaCount && semicolonCount >= tabCount) {
+            return ';';
+        }
+
+        if (tabCount > commaCount && tabCount > semicolonCount) {
+            return '\t';
+        }
+
+        return ',';
+    }
+
+    /**
      * Parse a single CSV row handling quoted fields and commas
      * @param {string} row - CSV row string
      * @returns {Array} Array of cell values
      */
-    parseCSVRow(row) {
+    parseCSVRow(row, delimiter = this.delimiter || ',') {
         const cells = [];
         let current = '';
         let inQuotes = false;
@@ -140,7 +167,7 @@ class CSVParser {
                     inQuotes = !inQuotes;
                     i++;
                 }
-            } else if (char === ',' && !inQuotes) {
+            } else if (char === delimiter && !inQuotes) {
                 // End of cell
                 cells.push(current.trim());
                 current = '';
