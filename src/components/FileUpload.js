@@ -431,9 +431,9 @@ class FileUpload {
             // Show completion
             this.showFileInfo(file, content);
             
-            // Notify parent component
+            // Notify parent component and wait for processing
             if (this.onFileProcessed) {
-                this.onFileProcessed(file, content);
+                await this.onFileProcessed(file, content);
             }
             
         } catch (error) {
