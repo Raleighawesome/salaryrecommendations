@@ -600,7 +600,11 @@ async function handleFileProcessed(file, content) {
         const duplicateResults = validator.detectDuplicates(parsedData.employees);
         
         // Load performance suggester and generate suggestions
-        if (!window.PerformanceSuggester) {
+        if (
+            !window.PerformanceSuggester ||
+            typeof window.PerformanceSuggester.prototype.generateSuggestions !==
+                'function'
+        ) {
             await loadPerformanceSuggester();
         }
         
