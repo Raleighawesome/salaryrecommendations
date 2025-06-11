@@ -820,7 +820,11 @@ function loadDataValidator() {
  */
 function loadPerformanceSuggester() {
     return new Promise((resolve, reject) => {
-        if (window.PerformanceSuggester) {
+        if (
+            window.PerformanceSuggester &&
+            typeof window.PerformanceSuggester.prototype.generateSuggestions ===
+                'function'
+        ) {
             resolve();
             return;
         }
