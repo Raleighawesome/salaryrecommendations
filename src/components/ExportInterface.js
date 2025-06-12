@@ -16,15 +16,31 @@ class ExportInterface {
     constructor(container, dataManager) {
         this.container = container;
         this.dataManager = dataManager;
-        this.exportManager = new ExportManager();
         this.isGoogleSheetsConfigured = false;
         
-        this.init();
+        try {
+            this.exportManager = new ExportManager();
+            this.init();
+        } catch (error) {
+            console.error('Error initializing ExportInterface:', error);
+            this.showErrorState('Failed to initialize export functionality. Please refresh the page.');
+        }
     }
 
     init() {
         this.render();
         this.attachEventListeners();
+    }
+    
+    showErrorState(message) {
+        this.container.innerHTML = `
+            <div class="export-error-state">
+                <div class="error-icon">⚠️</div>
+                <h3>Export Error</h3>
+                <p>${message}</p>
+                <button class="btn btn-primary" onclick="window.location.reload()">Reload Page</button>
+            </div>
+        `;
     }
 
     render() {

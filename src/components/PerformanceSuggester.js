@@ -1,9 +1,10 @@
 /**
- * Performance Rating Suggester Component
- * Provides interface for viewing and editing performance rating suggestions
+ * Salary Raise Suggester Component
+ * Provides interface for viewing and applying salary raise suggestions
+ * based on performance, comparatio, and market positioning
  */
 
-class PerformanceSuggesterComponent {
+class SalaryRaiseSuggesterComponent {
     constructor() {
         this.container = null;
         this.suggestions = [];
@@ -63,65 +64,69 @@ class PerformanceSuggesterComponent {
 
                 <div class="suggestion-card">
                     <div class="employee-info">
-                        <h4>${current.employee.name}</h4>
+                        <h4>${current.employeeName || current.employee?.name || 'Unknown Employee'}</h4>
                         <div class="employee-details">
                             <span class="detail-item">
-                                <strong>Title:</strong> ${current.employee.title || 'N/A'}
+                                <strong>ID:</strong> ${current.employeeId || current.employee?.id || 'N/A'}
                             </span>
                             <span class="detail-item">
-                                <strong>Salary:</strong> ${this.formatSalary(current.employee.salary)}
+                                <strong>Title:</strong> ${current.employee?.title || 'N/A'}
                             </span>
                             <span class="detail-item">
-                                <strong>Tenure:</strong> ${current.employee.tenure || 'N/A'} years
+                                <strong>Salary:</strong> ${this.formatSalary(current.employee?.salary)}
+                            </span>
+                            <span class="detail-item">
+                                <strong>Tenure:</strong> ${current.employee?.tenure || current.factors?.tenure?.timeInRole || 'N/A'} ${current.factors?.tenure?.timeInRole ? 'months' : 'years'}
                             </span>
                         </div>
                     </div>
 
                     <div class="suggestion-content">
                         <div class="suggestion-header">
-                            <div class="suggested-rating">
-                                <label>Suggested Rating:</label>
-                                <div class="rating-display ${this.getRatingClass(current.suggestedRating)}">
-                                    ${current.suggestedRating}
+                            <div class="salary-raise-info">
+                                <div class="current-salary">
+                                    <label>Current Salary:</label>
+                                    <div class="salary-display">
+                                        ${this.formatSalary(current.employee?.salary)}
+                                    </div>
+                                </div>
+                                <div class="raise-arrow">→</div>
+                                <div class="suggested-raise">
+                                    <label>Suggested Raise:</label>
+                                    <div class="raise-display">
+                                        ${this.formatRaise(current.suggestedRaise)}
+                                    </div>
                                 </div>
                             </div>
                             <div class="confidence-score">
                                 <label>Confidence:</label>
                                 <div class="confidence-bar">
-                                    <div class="confidence-fill" style="width: ${current.confidence}%"></div>
-                                    <span class="confidence-text">${current.confidence}%</span>
+                                    <div class="confidence-fill" style="width: ${current.confidence || 0}%"></div>
+                                    <span class="confidence-text">${current.confidence || 0}%</span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="reasoning-section">
                             <label>Reasoning:</label>
-                            <div class="reasoning-text">${current.reasoning}</div>
+                            <div class="reasoning-text">${current.reasoning || 'No reasoning provided'}</div>
                         </div>
 
                         <div class="factors-section">
                             <label>Analysis Factors:</label>
                             <div class="factors-grid">
-                                ${current.factors.map(factor => `
-                                    <div class="factor-item">
-                                        <span class="factor-name">${factor.name}:</span>
-                                        <span class="factor-value">${factor.value}</span>
-                                        <span class="factor-impact ${factor.impact}">${factor.impact}</span>
-                                    </div>
-                                `).join('')}
+                                ${this.renderFactors(current.factors)}
                             </div>
                         </div>
 
-                        <div class="rating-editor">
-                            <label for="custom-rating">Edit Rating:</label>
-                            <select id="custom-rating" class="rating-select">
-                                <option value="">Select Rating</option>
-                                <option value="1" ${current.suggestedRating === '1' ? 'selected' : ''}>1 - Poor</option>
-                                <option value="2" ${current.suggestedRating === '2' ? 'selected' : ''}>2 - Below Average</option>
-                                <option value="3" ${current.suggestedRating === '3' ? 'selected' : ''}>3 - Average</option>
-                                <option value="4" ${current.suggestedRating === '4' ? 'selected' : ''}>4 - Above Average</option>
-                                <option value="5" ${current.suggestedRating === '5' ? 'selected' : ''}>5 - Excellent</option>
-                            </select>
+                        <div class="raise-editor">
+                            <label for="custom-raise">Edit Raise Amount:</label>
+                            <input type="number" id="custom-raise" class="raise-input" 
+                                   value="${current.suggestedRaise?.rawAmount || ''}" 
+                                   placeholder="Enter raise amount" 
+                                   min="0" 
+                                   step="100">
+                            <small>Amount will be added to current salary</small>
                         </div>
                     </div>
 
@@ -130,10 +135,10 @@ class PerformanceSuggesterComponent {
                             Skip
                         </button>
                         <button class="btn btn-primary" id="apply-suggestion">
-                            Apply Rating
+                            Apply Raise
                         </button>
                         <button class="btn btn-success" id="apply-all-remaining">
-                            Apply All Remaining
+                            Apply All Raises
                         </button>
                     </div>
                 </div>
@@ -150,7 +155,7 @@ class PerformanceSuggesterComponent {
                 <div class="keyboard-hints">
                     <small>
                         <strong>Keyboard shortcuts:</strong>
-                        Enter = Apply • Space = Skip • ← → = Navigate • Esc = Close
+                        Enter = Apply Raise • Space = Skip • ← → = Navigate • Esc = Close
                     </small>
                 </div>
             </div>
@@ -192,13 +197,13 @@ class PerformanceSuggesterComponent {
             nextBtn.addEventListener('click', () => this.navigateNext());
         }
 
-        // Rating selection change
-        const ratingSelect = this.container.querySelector('#custom-rating');
-        if (ratingSelect) {
-            ratingSelect.addEventListener('change', (e) => {
+        // Raise amount change
+        const raiseInput = this.container.querySelector('#custom-raise');
+        if (raiseInput) {
+            raiseInput.addEventListener('input', (e) => {
                 const current = this.suggestions[this.currentIndex];
                 if (current) {
-                    current.customRating = e.target.value;
+                    current.customRaise = parseFloat(e.target.value) || 0;
                 }
             });
         }
@@ -248,25 +253,44 @@ class PerformanceSuggesterComponent {
         const current = this.suggestions[this.currentIndex];
         if (!current) return;
 
-        const ratingSelect = this.container.querySelector('#custom-rating');
-        const finalRating = ratingSelect ? ratingSelect.value : current.suggestedRating;
+        const raiseInput = this.container.querySelector('#custom-raise');
+        const finalRaise = raiseInput ? parseFloat(raiseInput.value) : current.suggestedRaise?.rawAmount;
 
-        if (!finalRating) {
-            this.showNotification('Please select a rating', 'warning');
+        if (!finalRaise || finalRaise <= 0) {
+            this.showNotification('Please enter a valid raise amount', 'warning');
             return;
         }
 
-        // Apply the rating to the employee
-        current.employee.performanceRating = finalRating;
+        // Apply the raise to the employee
+        if (current.employee && current.employee.salary) {
+            const newSalary = current.employee.salary.amount + finalRaise;
+            current.employee.salary = {
+                ...current.employee.salary,
+                amount: newSalary,
+                formatted: new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: current.employee.salary.currency || 'USD',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                }).format(newSalary)
+            };
+        }
         current.applied = true;
-        current.appliedRating = finalRating;
+        current.appliedRaise = finalRaise;
 
         // Callback
         if (this.onSuggestionApplied) {
-            this.onSuggestionApplied(current, finalRating);
+            this.onSuggestionApplied(current, finalRaise);
         }
 
-        this.showNotification(`Applied rating ${finalRating} to ${current.employee.name}`, 'success');
+        const employeeName = current.employeeName || current.employee?.name || 'Employee';
+        const raiseFormatted = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: current.employee?.salary?.currency || 'USD',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(finalRaise);
+        this.showNotification(`Applied ${raiseFormatted} raise to ${employeeName}`, 'success');
         this.moveToNext();
     }
 
@@ -284,7 +308,8 @@ class PerformanceSuggesterComponent {
             this.onSuggestionSkipped(current);
         }
 
-        this.showNotification(`Skipped suggestion for ${current.employee.name}`, 'info');
+        const employeeName = current.employeeName || current.employee?.name || 'Employee';
+        this.showNotification(`Skipped suggestion for ${employeeName}`, 'info');
         this.moveToNext();
     }
 
@@ -292,26 +317,39 @@ class PerformanceSuggesterComponent {
      * Apply all remaining suggestions
      */
     applyAllRemaining() {
-        if (!confirm('Apply suggested ratings to all remaining employees?')) {
+        if (!confirm('Apply suggested raises to all remaining employees?')) {
             return;
         }
 
         let appliedCount = 0;
         for (let i = this.currentIndex; i < this.suggestions.length; i++) {
             const suggestion = this.suggestions[i];
-            if (!suggestion.applied && !suggestion.skipped) {
-                suggestion.employee.performanceRating = suggestion.suggestedRating;
+            if (!suggestion.applied && !suggestion.skipped && suggestion.suggestedRaise?.rawAmount) {
+                const raiseAmount = suggestion.suggestedRaise.rawAmount;
+                if (suggestion.employee && suggestion.employee.salary) {
+                    const newSalary = suggestion.employee.salary.amount + raiseAmount;
+                    suggestion.employee.salary = {
+                        ...suggestion.employee.salary,
+                        amount: newSalary,
+                        formatted: new Intl.NumberFormat('en-US', {
+                            style: 'currency',
+                            currency: suggestion.employee.salary.currency || 'USD',
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0
+                        }).format(newSalary)
+                    };
+                }
                 suggestion.applied = true;
-                suggestion.appliedRating = suggestion.suggestedRating;
+                suggestion.appliedRaise = raiseAmount;
                 appliedCount++;
 
                 if (this.onSuggestionApplied) {
-                    this.onSuggestionApplied(suggestion, suggestion.suggestedRating);
+                    this.onSuggestionApplied(suggestion, raiseAmount);
                 }
             }
         }
 
-        this.showNotification(`Applied ${appliedCount} performance ratings`, 'success');
+        this.showNotification(`Applied ${appliedCount} salary raises`, 'success');
         this.complete();
     }
 
@@ -361,8 +399,8 @@ class PerformanceSuggesterComponent {
         this.container.innerHTML = `
             <div class="performance-suggester-complete">
                 <div class="complete-icon">✅</div>
-                <h3>Performance Suggestions Complete</h3>
-                <p>All performance rating suggestions have been processed.</p>
+                <h3>Salary Raise Suggestions Complete</h3>
+                <p>All salary raise suggestions have been processed.</p>
                 <button class="btn btn-primary" onclick="this.parentElement.style.display='none'">
                     Close
                 </button>
@@ -377,6 +415,56 @@ class PerformanceSuggesterComponent {
         if (this.container) {
             this.container.style.display = 'none';
         }
+    }
+
+    /**
+     * Render factors section
+     * @param {Object} factors - Factors object
+     * @returns {string} HTML for factors
+     */
+    renderFactors(factors) {
+        if (!factors || typeof factors !== 'object') {
+            return '<div class="factor-item">No analysis factors available</div>';
+        }
+
+        const factorEntries = Object.entries(factors);
+        if (factorEntries.length === 0) {
+            return '<div class="factor-item">No analysis factors available</div>';
+        }
+
+        return factorEntries.map(([key, factor]) => {
+            if (!factor || typeof factor !== 'object') return '';
+            
+            const score = factor.score || 0;
+            const reason = factor.reason || 'No reason provided';
+            const weight = factor.weight || 0;
+            
+            let impact = 'neutral';
+            if (score >= 4) impact = 'positive';
+            else if (score <= 2) impact = 'negative';
+            
+            // Enhanced display for salary factor to highlight the targeted comparison
+            let enhancedReason = reason;
+            if (key === 'salary' && factor.comparisonGroup) {
+                const confidenceIndicator = factor.sampleSize >= 3 ? 
+                    '<span class="high-confidence">📊 High Confidence</span>' : 
+                    factor.sampleSize >= 2 ? 
+                    '<span class="medium-confidence">📈 Medium Confidence</span>' : 
+                    '<span class="low-confidence">⚠️ Low Confidence</span>';
+                
+                enhancedReason = `${reason} ${confidenceIndicator}`;
+            }
+            
+            return `
+                <div class="factor-item">
+                    <div class="factor-header">
+                        <span class="factor-name">${key.charAt(0).toUpperCase() + key.slice(1)}</span>
+                        <span class="factor-score ${impact}">Score: ${score.toFixed(1)}</span>
+                    </div>
+                    <div class="factor-description">${enhancedReason}</div>
+                </div>
+            `;
+        }).join('');
     }
 
     /**
@@ -395,17 +483,144 @@ class PerformanceSuggesterComponent {
 
     /**
      * Format salary for display
-     * @param {number} salary - Salary amount
+     * @param {Object|number} salary - Salary object or amount
      * @returns {string} Formatted salary
      */
     formatSalary(salary) {
         if (!salary) return 'N/A';
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        }).format(salary);
+        
+        // If salary is an object with formatted property, use that
+        if (typeof salary === 'object' && salary.formatted) {
+            return salary.formatted;
+        }
+        
+        // If salary is an object with amount and currency, format accordingly
+        if (typeof salary === 'object' && salary.amount !== undefined) {
+            const amount = salary.amount;
+            const currency = salary.currency || 'USD';
+            
+            if (isNaN(amount)) return 'N/A';
+            
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: currency,
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+        
+        // If salary is a simple number
+        if (typeof salary === 'number') {
+            if (isNaN(salary)) return 'N/A';
+            
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(salary);
+        }
+        
+        return 'N/A';
+    }
+
+    /**
+     * Format raise amount for display
+     * @param {Object|number} raise - Raise object or amount
+     * @returns {string} Formatted raise
+     */
+    formatRaise(raise) {
+        if (!raise) return 'N/A';
+        
+        // If raise is an object with formatted property, use that
+        if (typeof raise === 'object' && raise.formatted) {
+            return raise.formatted;
+        }
+        
+        // If raise is an object with amount and percentage
+        if (typeof raise === 'object' && raise.amount !== undefined) {
+            const percentage = raise.percentage ? ` (${raise.percentage})` : '';
+            return `${raise.amount}${percentage}`;
+        }
+        
+        // If raise is an object with rawAmount
+        if (typeof raise === 'object' && raise.rawAmount !== undefined) {
+            const amount = raise.rawAmount;
+            const currency = raise.currency || 'USD';
+            const percentage = raise.percentage ? ` (${raise.percentage})` : '';
+            
+            if (isNaN(amount)) return 'N/A';
+            
+            const formatted = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: currency,
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+            
+            return `${formatted}${percentage}`;
+        }
+        
+        // If raise is a simple number
+        if (typeof raise === 'number') {
+            if (isNaN(raise)) return 'N/A';
+            
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(raise);
+        }
+        
+        return 'N/A';
+    }
+
+    /**
+     * Format current performance rating for display
+     * @param {Object|string|number} rating - Current performance rating
+     * @returns {string} Formatted rating
+     */
+    formatCurrentRating(rating) {
+        if (!rating) return 'No Rating';
+        
+        // If rating is an object with text property
+        if (typeof rating === 'object' && rating.text) {
+            return rating.text;
+        }
+        
+        // If rating is an object with numeric property
+        if (typeof rating === 'object' && rating.numeric) {
+            return this.getPerformanceText(rating.numeric);
+        }
+        
+        // If rating is a number
+        if (typeof rating === 'number') {
+            return this.getPerformanceText(rating);
+        }
+        
+        // If rating is a string
+        if (typeof rating === 'string') {
+            return rating;
+        }
+        
+        return 'No Rating';
+    }
+
+    /**
+     * Get performance text from numeric rating
+     * @param {number} rating - Numeric rating
+     * @returns {string} Performance text
+     */
+    getPerformanceText(rating) {
+        const numRating = parseFloat(rating);
+        if (isNaN(numRating)) return 'Unknown';
+        
+        if (numRating >= 4.5) return 'High Impact Performer';
+        if (numRating >= 3.5) return 'Successful Performer';
+        if (numRating >= 2.5) return 'Evolving Performer';
+        if (numRating >= 1.5) return 'Needs Improvement';
+        return 'Unsatisfactory';
     }
 
     /**
@@ -451,4 +666,6 @@ class PerformanceSuggesterComponent {
 }
 
 // Export for use in other modules
-window.PerformanceSuggesterComponent = PerformanceSuggesterComponent;
+window.SalaryRaiseSuggesterComponent = SalaryRaiseSuggesterComponent;
+// Maintain backward compatibility
+window.PerformanceSuggesterComponent = SalaryRaiseSuggesterComponent;

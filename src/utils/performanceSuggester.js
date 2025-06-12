@@ -210,6 +210,7 @@ class PerformanceSuggester {
         return {
             employeeId: employee.id,
             employeeName: employee.name,
+            employee: employee, // Include full employee object
             suggestedRating: {
                 numeric: suggestedRating,
                 text: this.getPerformanceText(suggestedRating),
@@ -232,7 +233,7 @@ class PerformanceSuggester {
      */
     analyzeEmployeeFactors(employee, allEmployees, baseline) {
         const factors = {
-            salary: this.analyzeSalaryFactor(employee, baseline),
+            salary: this.analyzeSalaryFactor(employee, allEmployees, baseline),
             comparatio: this.analyzeComparatioFactor(employee, baseline),
             tenure: this.analyzeTenureFactor(employee, baseline),
             country: this.analyzeCountryFactor(employee, allEmployees),
@@ -245,56 +246,141 @@ class PerformanceSuggester {
 
     /**
      * Analyze salary factor for performance suggestion
+     * Calculates salary average based on employees with same title and country
      * @param {Object} employee - Employee to analyze
+     * @param {Array} allEmployees - All employees for comparison
      * @param {Object} baseline - Performance baseline
      * @returns {Object} Salary factor analysis
      */
-    analyzeSalaryFactor(employee, baseline) {
+    analyzeSalaryFactor(employee, allEmployees, baseline) {
         if (!employee.salary || employee.salary.amount <= 0) {
-            return { score: 0, weight: 0, reason: 'No salary data' };
+            return { score: 0, weight: 0, reason: 'No salary data available' };
         }
 
-        const salaryRatio = employee.salary.amount / baseline.averageSalary;
+        // Find employees with same title and country for more accurate comparison
+        const comparablePeers = allEmployees.filter(emp => 
+            emp.title === employee.title && 
+            emp.country === employee.country && 
+            emp.salary && 
+            emp.salary.amount > 0 &&
+            emp.id !== employee.id // Exclude the employee being analyzed
+        );
+
+        let averageSalary;
+        let comparisonGroup;
+        let sampleSize;
+
+        if (comparablePeers.length >= 3) {
+            // Use peers with same title and country (minimum 3 for statistical relevance)
+            averageSalary = comparablePeers.reduce((sum, emp) => sum + emp.salary.amount, 0) / comparablePeers.length;
+            comparisonGroup = `${employee.title} in ${employee.country}`;
+            sampleSize = comparablePeers.length;
+        } else {
+            // Fallback to same title across all countries
+            const sameTitlePeers = allEmployees.filter(emp => 
+                emp.title === employee.title && 
+                emp.salary && 
+                emp.salary.amount > 0 &&
+                emp.id !== employee.id
+            );
+
+            if (sameTitlePeers.length >= 2) {
+                averageSalary = sameTitlePeers.reduce((sum, emp) => sum + emp.salary.amount, 0) / sameTitlePeers.length;
+                comparisonGroup = `${employee.title} (all countries)`;
+                sampleSize = sameTitlePeers.length;
+            } else {
+                // Final fallback to global average
+                averageSalary = baseline.averageSalary;
+                comparisonGroup = 'all employees';
+                sampleSize = baseline.sampleSize || 0;
+            }
+        }
+
+        const salaryRatio = employee.salary.amount / averageSalary;
         let score = 3.0; // Default to average
 
-        if (salaryRatio > 1.3) score = 4.5;
-        else if (salaryRatio > 1.1) score = 4.0;
-        else if (salaryRatio > 0.9) score = 3.0;
-        else if (salaryRatio > 0.7) score = 2.5;
-        else score = 2.0;
+        // More nuanced scoring based on salary positioning
+        if (salaryRatio >= 1.4) score = 4.8; // Significantly above average
+        else if (salaryRatio >= 1.2) score = 4.3; // Well above average
+        else if (salaryRatio >= 1.1) score = 3.8; // Above average
+        else if (salaryRatio >= 0.9) score = 3.2; // At average
+        else if (salaryRatio >= 0.8) score = 2.7; // Below average
+        else score = 2.2; // Significantly below average
+
+        const formattedEmployeeSalary = employee.salary.formatted || `${employee.salary.currency || 'USD'} ${employee.salary.amount.toLocaleString()}`;
+        const formattedAverageSalary = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: employee.salary.currency || 'USD',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(averageSalary);
 
         return {
             score: score,
-            weight: Math.abs(baseline.correlations.salaryToRating) * 0.3,
-            reason: `Salary is ${Math.round(salaryRatio * 100)}% of average`,
-            salaryRatio: salaryRatio
+            weight: Math.abs(baseline.correlations.salaryToRating || 0.3) * 0.4, // Higher weight for targeted comparison
+            reason: `Salary ${formattedEmployeeSalary} is ${Math.round(salaryRatio * 100)}% of average ${formattedAverageSalary} for ${comparisonGroup} (sample: ${sampleSize})`,
+            salaryRatio: salaryRatio,
+            averageSalary: averageSalary,
+            comparisonGroup: comparisonGroup,
+            sampleSize: sampleSize,
+            employeeSalary: employee.salary.amount
         };
     }
 
     /**
      * Analyze comparatio factor for performance suggestion
+     * Comparatio = Current Salary ÷ Mid Pay Grade Value
+     * Used to assess if employee's performance aligns with their pay positioning
      * @param {Object} employee - Employee to analyze
      * @param {Object} baseline - Performance baseline
      * @returns {Object} Comparatio factor analysis
      */
     analyzeComparatioFactor(employee, baseline) {
         if (!employee.comparatio) {
-            return { score: 0, weight: 0, reason: 'No comparatio data' };
+            return { score: 0, weight: 0, reason: 'No comparatio data available' };
         }
 
         let score = 3.0; // Default to average
+        let performanceLevel = '';
+        let reason = '';
 
-        if (employee.comparatio > 1.2) score = 4.5;
-        else if (employee.comparatio > 1.1) score = 4.0;
-        else if (employee.comparatio > 0.9) score = 3.0;
-        else if (employee.comparatio > 0.8) score = 2.5;
-        else score = 2.0;
+        // Updated logic based on correct comparatio interpretation
+        // Higher comparatio suggests higher performance (paid above midpoint)
+        // Lower comparatio may indicate underperformance or being underpaid
+        
+        if (employee.comparatio >= 1.2) {
+            score = 4.8; // Very high performance - paid at premium
+            performanceLevel = 'exceptional';
+            reason = `Comparatio of ${(employee.comparatio * 100).toFixed(0)}% indicates premium pay positioning, suggesting exceptional performance`;
+        } else if (employee.comparatio >= 1.1) {
+            score = 4.2; // High performance - paid above midpoint
+            performanceLevel = 'high';
+            reason = `Comparatio of ${(employee.comparatio * 100).toFixed(0)}% indicates above-midpoint positioning, suggesting strong performance`;
+        } else if (employee.comparatio >= 0.9) {
+            score = 3.5; // Good performance - paid around midpoint
+            performanceLevel = 'good';
+            reason = `Comparatio of ${(employee.comparatio * 100).toFixed(0)}% indicates market-rate positioning, suggesting solid performance`;
+        } else if (employee.comparatio >= 0.8) {
+            score = 2.8; // Below average - paid below midpoint
+            performanceLevel = 'developing';
+            reason = `Comparatio of ${(employee.comparatio * 100).toFixed(0)}% indicates below-midpoint positioning, may suggest developing performance or underpaid status`;
+        } else {
+            score = 2.2; // Low - significantly below midpoint
+            performanceLevel = 'needs attention';
+            reason = `Comparatio of ${(employee.comparatio * 100).toFixed(0)}% indicates significantly below-market positioning, requires performance or compensation review`;
+        }
 
+        // Adjust weight based on how reliable comparatio is as a performance indicator
+        // Strong correlation means higher weight
+        const correlationWeight = Math.abs(baseline.correlations.comparatioToRating || 0.4);
+        
         return {
             score: score,
-            weight: Math.abs(baseline.correlations.comparatioToRating) * 0.4,
-            reason: `Comparatio of ${employee.comparatio.toFixed(2)} suggests ${score >= 4 ? 'high' : score >= 3 ? 'average' : 'below average'} performance`,
-            comparatio: employee.comparatio
+            weight: correlationWeight * 0.5, // Comparatio is a strong indicator when correlated
+            reason: reason,
+            comparatio: employee.comparatio,
+            performanceLevel: performanceLevel,
+            comparatioPercent: (employee.comparatio * 100).toFixed(0) + '%'
         };
     }
 

@@ -38,6 +38,10 @@ class VirtualScroll {
             throw new Error('Container element is required for virtual scrolling');
         }
 
+        console.log('🔍 VirtualScroll init - container:', this.container);
+        console.log('🔍 VirtualScroll init - data length:', this.data.length);
+        console.log('🔍 VirtualScroll init - itemHeight:', this.itemHeight);
+
         // Create viewport structure
         this.createViewport();
         
@@ -47,6 +51,8 @@ class VirtualScroll {
         // Initial render
         this.updateVisibleRange();
         this.render();
+        
+        console.log('✅ VirtualScroll initialized');
     }
 
     /**
@@ -136,18 +142,24 @@ class VirtualScroll {
      * Render visible items
      */
     render() {
+        console.log('🔍 VirtualScroll render - visibleStart:', this.visibleStart, 'visibleEnd:', this.visibleEnd);
+        console.log('🔍 VirtualScroll render - data length:', this.data.length);
+        
         // Remove items that are no longer visible
         this.cleanupInvisibleItems();
         
         // Render visible items
         for (let i = this.visibleStart; i <= this.visibleEnd; i++) {
             if (!this.renderedItems.has(i)) {
+                console.log('🔍 VirtualScroll rendering item at index:', i);
                 this.renderItemAt(i);
             }
         }
         
         // Update spacers
         this.updateSpacers();
+        
+        console.log('✅ VirtualScroll render completed - rendered items:', this.renderedItems.size);
     }
 
     /**
@@ -155,10 +167,17 @@ class VirtualScroll {
      * @param {number} index - Item index
      */
     renderItemAt(index) {
-        if (index < 0 || index >= this.data.length) return;
+        if (index < 0 || index >= this.data.length) {
+            console.log('🔍 VirtualScroll renderItemAt - index out of bounds:', index, 'data length:', this.data.length);
+            return;
+        }
         
         const item = this.data[index];
+        console.log('🔍 VirtualScroll renderItemAt - item:', item);
+        console.log('🔍 VirtualScroll renderItemAt - renderItem function:', typeof this.renderItem);
+        
         const element = this.renderItem(item, index);
+        console.log('🔍 VirtualScroll renderItemAt - element created:', !!element);
         
         if (element) {
             element.style.cssText = `
@@ -173,6 +192,9 @@ class VirtualScroll {
             element.setAttribute('data-index', index);
             this.content.appendChild(element);
             this.renderedItems.set(index, element);
+            console.log('✅ VirtualScroll renderItemAt - element added to DOM');
+        } else {
+            console.error('❌ VirtualScroll renderItemAt - renderItem returned null/undefined');
         }
     }
 

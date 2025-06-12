@@ -32,7 +32,7 @@ class DataTable {
         this.onRowMerge = options.onRowMerge || (() => {});
         this.onSort = options.onSort || (() => {});
         
-        // Column definitions
+        // Column definitions - ordered as requested: Name, Job title, Salary, Comparatio, Performance, Country
         this.columns = [
             {
                 key: 'name',
@@ -47,13 +47,6 @@ class DataTable {
                 sortable: true,
                 className: 'col-title',
                 render: this.renderTitleCell.bind(this)
-            },
-            {
-                key: 'country',
-                title: 'Country',
-                sortable: true,
-                className: 'col-country',
-                render: this.renderCountryCell.bind(this)
             },
             {
                 key: 'salary',
@@ -77,11 +70,11 @@ class DataTable {
                 render: this.renderPerformanceCell.bind(this)
             },
             {
-                key: 'futureTalent',
-                title: 'Future Talent',
+                key: 'country',
+                title: 'Country',
                 sortable: true,
-                className: 'col-future-talent',
-                render: this.renderFutureTalentCell.bind(this)
+                className: 'col-country',
+                render: this.renderCountryCell.bind(this)
             }
         ];
         
@@ -180,6 +173,15 @@ class DataTable {
      * Initialize virtual scrolling
      */
     initVirtualScroll() {
+        console.log('🔍 Initializing virtual scroll...');
+        console.log('🔍 bodyContainer:', this.bodyContainer);
+        console.log('🔍 bodyContainer dimensions:', {
+            width: this.bodyContainer.offsetWidth,
+            height: this.bodyContainer.offsetHeight,
+            scrollHeight: this.bodyContainer.scrollHeight
+        });
+        console.log('🔍 filteredData length:', this.filteredData.length);
+        
         this.virtualScroll = new VirtualScroll({
             container: this.bodyContainer,
             itemHeight: this.options.itemHeight,
@@ -188,6 +190,8 @@ class DataTable {
             renderItem: this.renderRow.bind(this),
             onScroll: this.handleScroll.bind(this)
         });
+        
+        console.log('✅ Virtual scroll initialized:', !!this.virtualScroll);
     }
 
     /**
@@ -406,6 +410,10 @@ class DataTable {
      * @returns {HTMLElement} Row element
      */
     renderRow(employee, index) {
+        console.log('🔍 renderRow called for index:', index, 'employee:', employee);
+        console.log('🔍 this.columns:', this.columns);
+        console.log('🔍 this.columns length:', this.columns ? this.columns.length : 'undefined');
+        
         const row = document.createElement('div');
         row.className = 'data-table-row';
         row.setAttribute('data-index', index);
@@ -430,11 +438,30 @@ class DataTable {
         }
         
         // Render cells
-        this.columns.forEach(column => {
-            const cell = column.render(employee, index);
-            row.appendChild(cell);
-        });
+        if (this.columns && Array.isArray(this.columns)) {
+            console.log('🔍 Rendering', this.columns.length, 'columns');
+            this.columns.forEach((column, colIndex) => {
+                console.log('🔍 Rendering column', colIndex, ':', column.key);
+                try {
+                    const cell = column.render(employee, index);
+                    if (cell) {
+                        row.appendChild(cell);
+                        console.log('✅ Column', column.key, 'rendered successfully');
+                    } else {
+                        console.error('❌ Column', column.key, 'render returned null/undefined');
+                    }
+                } catch (error) {
+                    console.error('❌ Error rendering column', column.key, ':', error);
+                }
+            });
+        } else {
+            console.error('❌ this.columns is not defined or not an array');
+        }
         
+        console.log('✅ Row rendered with', row.children.length, 'cells');
+        console.log('🔍 Row element:', row);
+        console.log('🔍 Row className:', row.className);
+        console.log('🔍 Row innerHTML length:', row.innerHTML.length);
         return row;
     }
 
@@ -509,16 +536,30 @@ class DataTable {
         cell.className = 'data-table-cell cell-comparatio col-comparatio';
         
         if (employee.comparatio !== null && employee.comparatio !== undefined) {
-            cell.textContent = employee.comparatio.toFixed(2);
+            // Display as percentage (e.g., 82% instead of 0.82)
+            const percentage = (employee.comparatio * 100).toFixed(0) + '%';
+            cell.textContent = percentage;
             
-            // Add color coding
-            if (employee.comparatio > 1.1) {
-                cell.classList.add('high');
-            } else if (employee.comparatio < 0.9) {
-                cell.classList.add('low');
+            // Enhanced color coding based on correct comparatio interpretation
+            if (employee.comparatio >= 1.2) {
+                cell.classList.add('premium'); // Premium pay (120%+)
+                cell.title = 'Premium pay positioning - significantly above midpoint';
+            } else if (employee.comparatio >= 1.1) {
+                cell.classList.add('high'); // Above midpoint (110-120%)
+                cell.title = 'Above midpoint positioning - well compensated';
+            } else if (employee.comparatio >= 0.9) {
+                cell.classList.add('market'); // At market (90-110%)
+                cell.title = 'Market rate positioning - around midpoint';
+            } else if (employee.comparatio >= 0.8) {
+                cell.classList.add('low'); // Below midpoint (80-90%)
+                cell.title = 'Below midpoint positioning - may need adjustment';
+            } else {
+                cell.classList.add('critical'); // Significantly below midpoint (<80%)
+                cell.title = 'Significantly below midpoint - requires attention';
             }
         } else {
             cell.textContent = 'N/A';
+            cell.title = 'Comparatio data not available';
         }
         
         return cell;
@@ -902,18 +943,51 @@ class DataTable {
      * @param {Array} data - New data array
      */
     updateData(data) {
+        console.log('🔍 DataTable.updateData called with:', data);
+        console.log('🔍 Data type:', typeof data);
+        console.log('🔍 Data is array:', Array.isArray(data));
+        console.log('🔍 Data length:', data ? data.length : 'undefined');
+        
         this.data = data || [];
         this.filteredData = [...this.data];
         this.selectedRows.clear();
         this.lastSelectedIndex = null;
         
-        if (this.sortColumn) {
-            this.applySorting();
+        console.log('🔍 this.data length:', this.data.length);
+        console.log('🔍 this.filteredData length:', this.filteredData.length);
+        console.log('🔍 virtualScroll exists:', !!this.virtualScroll);
+        
+        // Handle empty vs populated data states
+        if (this.data.length === 0) {
+            console.log('🔍 No data - showing empty state');
+            this.showEmptyState();
         } else {
-            this.virtualScroll.updateData(this.filteredData);
+            console.log('🔍 Data available - updating virtual scroll');
+            // Hide empty state if it was showing
+            this.hideEmptyState();
+            
+            if (this.sortColumn) {
+                console.log('🔍 Applying sorting...');
+                this.applySorting();
+            } else {
+                console.log('🔍 Updating virtual scroll with data...');
+                if (this.virtualScroll) {
+                    this.virtualScroll.updateData(this.filteredData);
+                    console.log('✅ Virtual scroll updated');
+                } else {
+                    console.error('❌ Virtual scroll not available');
+                    console.log('🔍 Attempting to reinitialize virtual scroll...');
+                    this.initVirtualScroll();
+                    if (this.virtualScroll) {
+                        this.virtualScroll.updateData(this.filteredData);
+                        console.log('✅ Virtual scroll reinitialized and updated');
+                    }
+                }
+            }
         }
         
         this.updateInfoBar();
+        console.log('✅ DataTable.updateData completed');
     }
 
     /**
@@ -972,16 +1046,35 @@ class DataTable {
     }
 
     /**
-     * Show empty state
+     * Show empty state without destroying virtual scroll container
      */
     showEmptyState() {
-        this.bodyContainer.innerHTML = `
-            <div class="data-table-empty">
-                <div class="data-table-empty-icon">📊</div>
-                <div class="data-table-empty-title">No Data Available</div>
-                <div class="data-table-empty-message">Upload a CSV file to view employee data</div>
-            </div>
-        `;
+        // Only show empty state if virtual scroll is not initialized yet
+        if (!this.virtualScroll) {
+            this.bodyContainer.innerHTML = `
+                <div class="data-table-empty">
+                    <div class="data-table-empty-icon">📊</div>
+                    <div class="data-table-empty-title">No Data Available</div>
+                    <div class="data-table-empty-message">Upload a CSV file to view employee data</div>
+                </div>
+            `;
+        } else {
+            // Virtual scroll exists, just clear its data
+            this.virtualScroll.updateData([]);
+        }
+    }
+    
+    /**
+     * Hide empty state and ensure virtual scroll is ready
+     */
+    hideEmptyState() {
+        const emptyState = this.bodyContainer.querySelector('.data-table-empty');
+        if (emptyState) {
+            console.log('🔍 Removing empty state');
+            // Remove empty state and reinitialize virtual scroll structure
+            this.bodyContainer.innerHTML = '';
+            this.initVirtualScroll();
+        }
     }
 
     /**

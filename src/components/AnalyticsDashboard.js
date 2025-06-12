@@ -26,6 +26,45 @@ class AnalyticsDashboard {
         this.attachEventListeners();
     }
     
+    setEmployees(employees) {
+        try {
+            this.employees = employees || [];
+            if (this.employees.length === 0) {
+                this.showEmptyState();
+                return;
+            }
+            
+            this.analyzeData();
+            this.updateDashboard();
+        } catch (error) {
+            console.error('Error setting employees in analytics dashboard:', error);
+            this.showErrorState('Unable to load analytics data. Please try refreshing the page.');
+        }
+    }
+    
+    showEmptyState() {
+        const mainContent = this.container.querySelector('.analytics-dashboard') || this.container;
+        mainContent.innerHTML = `
+            <div class="analytics-empty-state">
+                <div class="empty-icon">📊</div>
+                <h3>No Data Available</h3>
+                <p>Upload employee data to view team analytics and insights.</p>
+            </div>
+        `;
+    }
+    
+    showErrorState(message) {
+        const mainContent = this.container.querySelector('.analytics-dashboard') || this.container;
+        mainContent.innerHTML = `
+            <div class="analytics-error-state">
+                <div class="error-icon">⚠️</div>
+                <h3>Analytics Error</h3>
+                <p>${message}</p>
+                <button class="btn btn-primary" onclick="window.location.reload()">Reload Page</button>
+            </div>
+        `;
+    }
+    
     render() {
         this.container.innerHTML = `
             <div class="analytics-dashboard">
@@ -559,33 +598,59 @@ class AnalyticsDashboard {
     }
     
     createSalaryDistributionChart() {
-        const ctx = document.getElementById('salary-distribution-chart').getContext('2d');
-        const data = this.analytics.distribution.salary;
-        
-        // Simple bar chart implementation (would use Chart.js in production)
-        this.drawBarChart(ctx, {
-            labels: Object.keys(data),
-            values: Object.values(data),
-            title: 'Salary Distribution'
-        });
-        
-        // Update insights
-        const insights = this.generateSalaryInsights(data);
-        document.getElementById('salary-insights').innerHTML = insights;
+        try {
+            const canvas = document.getElementById('salary-distribution-chart');
+            if (!canvas) {
+                console.warn('Salary distribution chart canvas not found');
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            const data = this.analytics.distribution.salary;
+            
+            // Simple bar chart implementation (would use Chart.js in production)
+            this.drawBarChart(ctx, {
+                labels: Object.keys(data),
+                values: Object.values(data),
+                title: 'Salary Distribution'
+            });
+            
+            // Update insights
+            const insights = this.generateSalaryInsights(data);
+            const insightsElement = document.getElementById('salary-insights');
+            if (insightsElement) {
+                insightsElement.innerHTML = insights;
+            }
+        } catch (error) {
+            console.error('Error creating salary distribution chart:', error);
+        }
     }
     
     createPerformanceDistributionChart() {
-        const ctx = document.getElementById('performance-distribution-chart').getContext('2d');
-        const data = this.analytics.distribution.performance;
-        
-        this.drawBarChart(ctx, {
-            labels: Object.keys(data).map(k => `Rating ${k}`),
-            values: Object.values(data),
-            title: 'Performance Distribution'
-        });
-        
-        const insights = this.generatePerformanceInsights(data);
-        document.getElementById('performance-insights').innerHTML = insights;
+        try {
+            const canvas = document.getElementById('performance-distribution-chart');
+            if (!canvas) {
+                console.warn('Performance distribution chart canvas not found');
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            const data = this.analytics.distribution.performance;
+            
+            this.drawBarChart(ctx, {
+                labels: Object.keys(data).map(k => `Rating ${k}`),
+                values: Object.values(data),
+                title: 'Performance Distribution'
+            });
+            
+            const insights = this.generatePerformanceInsights(data);
+            const insightsElement = document.getElementById('performance-insights');
+            if (insightsElement) {
+                insightsElement.innerHTML = insights;
+            }
+        } catch (error) {
+            console.error('Error creating performance distribution chart:', error);
+        }
     }
     
     createSalaryPerformanceChart() {

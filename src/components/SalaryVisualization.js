@@ -32,15 +32,29 @@ class SalaryVisualization {
     loadChartJS() {
         // Load Chart.js from CDN if not already loaded
         if (typeof Chart === 'undefined') {
+            this.showLoadingState();
             const script = document.createElement('script');
             script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js';
             script.onload = () => {
                 console.log('Chart.js loaded successfully');
-                this.createCharts();
+                this.hideLoadingState();
+                if (this.employees && this.employees.length > 0) {
+                    this.createCharts();
+                } else {
+                    this.showEmptyState();
+                }
+            };
+            script.onerror = () => {
+                console.error('Failed to load Chart.js');
+                this.showErrorState('Failed to load charting library. Please check your internet connection.');
             };
             document.head.appendChild(script);
         } else {
-            this.createCharts();
+            if (this.employees && this.employees.length > 0) {
+                this.createCharts();
+            } else {
+                this.showEmptyState();
+            }
         }
     }
     
@@ -305,6 +319,46 @@ class SalaryVisualization {
         
         // Recreate charts with filtered data
         this.createCharts();
+    }
+    
+    showLoadingState() {
+        const container = this.container.querySelector('.visualizations-container') || this.container;
+        container.innerHTML = `
+            <div class="viz-loading-state">
+                <div class="loading-spinner"></div>
+                <h3>Loading Visualizations...</h3>
+                <p>Please wait while we load the charting library and prepare your data visualizations.</p>
+            </div>
+        `;
+    }
+    
+    hideLoadingState() {
+        // Re-render the component
+        this.render();
+        this.attachEventListeners();
+    }
+    
+    showErrorState(message) {
+        const container = this.container.querySelector('.visualizations-container') || this.container;
+        container.innerHTML = `
+            <div class="viz-error-state">
+                <div class="error-icon">⚠️</div>
+                <h3>Visualization Error</h3>
+                <p>${message}</p>
+                <button class="btn btn-primary" onclick="window.location.reload()">Reload Page</button>
+            </div>
+        `;
+    }
+    
+    showEmptyState() {
+        const container = this.container.querySelector('.visualizations-container') || this.container;
+        container.innerHTML = `
+            <div class="viz-empty-state">
+                <div class="empty-icon">📊</div>
+                <h3>No Data Available</h3>
+                <p>Upload employee data to view salary visualizations and analytics.</p>
+            </div>
+        `;
     }
     
     createSalaryHistogram() {

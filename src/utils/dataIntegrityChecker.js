@@ -18,15 +18,12 @@
 
 class DataIntegrityChecker {
     constructor() {
+        console.log('🔄 DataIntegrityChecker constructor called');
+        
         this.validationRules = {};
         this.businessRules = {};
         this.cleaningRules = {};
         this.validationHistory = [];
-        
-        // Initialize validation rules
-        this.initializeValidationRules();
-        this.initializeBusinessRules();
-        this.initializeCleaningRules();
         
         // Validation severity levels
         this.severity = {
@@ -47,6 +44,17 @@ class DataIntegrityChecker {
             REFERENTIAL: 'referential',
             COMPLETENESS: 'completeness'
         };
+        
+        console.log('🔍 Categories defined:', this.categories);
+        console.log('🔍 Severity levels defined:', this.severity);
+        
+        // Initialize validation rules
+        console.log('🔄 Initializing validation rules...');
+        this.initializeValidationRules();
+        this.initializeBusinessRules();
+        this.initializeCleaningRules();
+        
+        console.log('✅ DataIntegrityChecker constructor completed successfully');
     }
 
     /**
@@ -90,7 +98,8 @@ class DataIntegrityChecker {
                     severity: this.severity.MEDIUM,
                     validate: (value) => {
                         if (!value) return true; // Skip if empty (handled by required rule)
-                        return /^[a-zA-Z\s\-'\.]+$/.test(value.trim());
+                        // Allow letters, spaces, hyphens, apostrophes, periods, and commas for names like "Jones, Asa"
+                        return /^[a-zA-Z\s\-'\.,()\u00C0-\u017F]+$/.test(value.trim());
                     },
                     message: 'Name contains invalid characters'
                 },
@@ -144,7 +153,13 @@ class DataIntegrityChecker {
                     validate: (value) => {
                         if (!value) return true;
                         const validCountries = this.getValidCountries();
-                        return validCountries.includes(value.trim());
+                        const countryMappings = this.getCountryMappings();
+                        const trimmedValue = value.trim();
+                        
+                        // Check if it's a valid country code, full name, or mapped name
+                        return validCountries.includes(trimmedValue) || 
+                               Object.keys(countryMappings).includes(trimmedValue.toLowerCase()) ||
+                               Object.values(countryMappings).includes(trimmedValue);
                     },
                     message: 'Invalid country code or name'
                 }
@@ -197,8 +212,28 @@ class DataIntegrityChecker {
                     severity: this.severity.MEDIUM,
                     validate: (value) => {
                         if (value === null || value === undefined) return true; // Optional field
-                        const validRatings = ['Exceeds Expectations', 'Meets Expectations', 'Below Expectations', 'Needs Improvement'];
-                        return validRatings.includes(value);
+                        
+                        // Handle both object format and string format
+                        let ratingValue = value;
+                        if (typeof value === 'object' && value.text) {
+                            ratingValue = value.text;
+                        }
+                        
+                        if (!ratingValue) return true;
+                        
+                        // Red Hat performance ratings
+                        const validRatings = [
+                            'High Impact Performer',
+                            'Successful Performer', 
+                            'Evolving Performer',
+                            'Needs Improvement',
+                            'Unsatisfactory',
+                            // Legacy ratings for compatibility
+                            'Exceeds Expectations', 
+                            'Meets Expectations', 
+                            'Below Expectations'
+                        ];
+                        return validRatings.includes(ratingValue.trim());
                     },
                     message: 'Invalid performance rating'
                 }
@@ -226,9 +261,10 @@ class DataIntegrityChecker {
                     severity: this.severity.LOW,
                     validate: (value) => {
                         if (value === null || value === undefined) return true;
-                        return value >= 0 && value <= 50;
+                        // More reasonable range - some people might have very long careers
+                        return value >= 0 && value <= 600; // 600 months = 50 years
                     },
-                    message: 'Time in role should be between 0 and 50 years'
+                    message: 'Time in role should be between 0 and 50 years (600 months)'
                 }
             ],
             
@@ -240,9 +276,10 @@ class DataIntegrityChecker {
                     severity: this.severity.LOW,
                     validate: (value) => {
                         if (value === null || value === undefined) return true;
-                        return value >= 0 && value <= 10;
+                        // More reasonable range - some people might not have had raises for longer periods
+                        return value >= 0 && value <= 120; // 120 months = 10 years
                     },
-                    message: 'Time since raise should be between 0 and 10 years'
+                    message: 'Time since raise should be between 0 and 10 years (120 months)'
                 }
             ]
         };
@@ -871,7 +908,13 @@ class DataIntegrityChecker {
     }
     
     getValidCountries() {
-        return ['US', 'CA', 'UK', 'DE', 'FR', 'AU', 'JP', 'IN', 'BR', 'MX', 'NL', 'SE', 'NO', 'DK', 'FI'];
+        return [
+            // Country codes
+            'US', 'CA', 'UK', 'DE', 'FR', 'AU', 'JP', 'IN', 'BR', 'MX', 'NL', 'SE', 'NO', 'DK', 'FI',
+            // Full country names (from Red Hat CSV)
+            'United States of America', 'India', 'Canada', 'United Kingdom', 'Germany', 'France', 
+            'Australia', 'Japan', 'Brazil', 'Mexico', 'Netherlands', 'Sweden', 'Norway', 'Denmark', 'Finland'
+        ];
     }
     
     getValidCurrencies() {
@@ -881,6 +924,7 @@ class DataIntegrityChecker {
     getCountryMappings() {
         return {
             'united states': 'US',
+            'united states of america': 'US',
             'canada': 'CA',
             'united kingdom': 'UK',
             'germany': 'DE',
@@ -889,7 +933,12 @@ class DataIntegrityChecker {
             'japan': 'JP',
             'india': 'IN',
             'brazil': 'BR',
-            'mexico': 'MX'
+            'mexico': 'MX',
+            'netherlands': 'NL',
+            'sweden': 'SE',
+            'norway': 'NO',
+            'denmark': 'DK',
+            'finland': 'FI'
         };
     }
     

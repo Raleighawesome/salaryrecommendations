@@ -15,6 +15,206 @@ body {
     background-color: #f8f9fa;
 }
 
+/* Error and loading states */
+.viz-loading-state,
+.viz-error-state,
+.viz-empty-state,
+.analytics-empty-state,
+.analytics-error-state,
+.export-error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+    min-height: 300px;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e2e8f0;
+    border-top: 4px solid #3182ce;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.error-icon,
+.empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.viz-loading-state h3,
+.viz-error-state h3,
+.viz-empty-state h3,
+.analytics-empty-state h3,
+.analytics-error-state h3,
+.export-error-state h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+    color: #2d3748;
+}
+
+.viz-loading-state p,
+.viz-error-state p,
+.viz-empty-state p,
+.analytics-empty-state p,
+.analytics-error-state p,
+.export-error-state p {
+    margin: 0 0 1.5rem 0;
+    color: #718096;
+    max-width: 500px;
+}
+
+/* Salary Raise Suggester Components */
+.salary-raise-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.current-salary,
+.suggested-raise {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.current-salary label,
+.suggested-raise label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #666;
+}
+
+.raise-arrow {
+    font-size: 1.5rem;
+    color: #28a745;
+    font-weight: bold;
+    margin: 0 0.5rem;
+}
+
+.salary-display,
+.raise-display {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    text-align: center;
+    min-width: 140px;
+    font-size: 0.9rem;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+}
+
+.raise-display {
+    background: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+/* Raise Editor Styles */
+.raise-editor {
+    margin-bottom: 20px;
+}
+
+.raise-editor label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.raise-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    background: white;
+    color: #374151;
+    margin-bottom: 4px;
+}
+
+.raise-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.raise-editor small {
+    color: #6b7280;
+    font-size: 0.75rem;
+}
+
+/* Performance Suggester Rating Comparison (Legacy) */
+.rating-comparison {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.current-rating,
+.suggested-rating {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.current-rating label,
+.suggested-rating label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #666;
+}
+
+.rating-arrow {
+    font-size: 1.5rem;
+    color: #007bff;
+    font-weight: bold;
+    margin: 0 0.5rem;
+}
+
+.rating-display {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    text-align: center;
+    min-width: 140px;
+    font-size: 0.9rem;
+}
+
+/* Confidence Indicators for Analysis Factors */
+.high-confidence {
+    color: #28a745;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.medium-confidence {
+    color: #ffc107;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.low-confidence {
+    color: #dc3545;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
 /* App Container */
 .app-container {
     min-height: 100vh;

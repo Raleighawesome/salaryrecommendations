@@ -54,32 +54,69 @@ A comprehensive web-based application for analyzing employee data, planning sala
 
 ## 📊 CSV File Format
 
-Your CSV file should include the following columns:
+The application supports Red Hat compensation report format and other standard HR CSV formats.
 
 *The parser automatically detects commas, semicolons, or tabs as the delimiter.*
 
 ### Required Columns
-- `id`: Unique employee identifier
-- `name`: Employee full name
-- `title`: Job title or role
-- `country`: Country location
-- `salary_amount`: Current salary amount (numeric)
-- `salary_currency`: Currency code (USD, EUR, GBP, etc.)
+- `Employee Full name`: Employee full name
+- `Business Title`: Job title or role
+- `Country`: Country location
+- `Total Base Pay`: Current salary amount (numeric)
+- `Comparatio`: Salary comparatio (percentage or decimal) - calculated as current salary ÷ mid pay grade value
+- `Overall Performance Rating`: Performance rating
 
-### Optional Columns
-- `performance_rating`: Performance rating (Exceeds/Meets/Below/Needs Improvement)
-- `comparatio`: Salary comparatio (0.5-2.0)
-- `time_in_role_months`: Months in current role
-- `time_since_last_raise_months`: Months since last raise
-- `future_talent`: Future talent rating
+### Optional Columns (Enhances Functionality)
+- `Identified as Future Talent?`: Future talent flag (Yes/No)
+- `Manager Full name`: Manager's name
+- `Latest Hire Date`: Employee hire date
+- `Last Salary Change Date`: Date of last salary change
+- `Currency`: Currency code (USD, EUR, GBP, INR, etc.)
+- `Grade Band`: Employee grade/level
+- `Location`: Office location
+- `Management Level`: Management level description
+- `Below Range Minimum?`: Flag for below range salaries
 
-### Example CSV Structure
+### Supported Performance Ratings
+- **High Impact Performer** (5/5)
+- **Successful Performer** (4/5)
+- **Evolving Performer** (3/5)
+- **Needs Improvement** (2/5)
+- **Unsatisfactory** (1/5)
+
+### Example Red Hat CSV Structure
 ```csv
-id,name,title,country,salary_amount,salary_currency,performance_rating,time_in_role_months
-1,John Smith,Software Engineer,USA,85000,USD,Meets Expectations,18
-2,Jane Doe,Product Manager,UK,75000,GBP,Exceeds Expectations,24
-3,Bob Johnson,Designer,Canada,70000,CAD,Meets Expectations,12
+Employee Number,Employee Full name,Business Title,Country,Total Base Pay,Currency,Comparatio,Overall Performance Rating,Identified as Future Talent?,Manager Full name
+103903,"Jones, Asa",Senior Software Engineer,United States of America,"141,917.00",USD,92%,High Impact Performer,Yes,"Riley, Andrew Michael"
+16005271,"Chowdhury, Soumyadip",Senior Software Engineer,India,"837,654.00",INR,74%,Successful Performer,Yes,"Kulkarni, Ketan Sanjeev"
 ```
+
+## 📊 Understanding Salary Comparatio
+
+**Comparatio** is a key metric for compensation analysis that represents how an employee's current salary compares to the midpoint of their pay grade range.
+
+### Calculation
+```
+Comparatio = Current Salary ÷ Mid Pay Grade Value
+```
+
+### Example
+- Bobby's salary: $151,000
+- Mid pay grade for his title/location: $184,857
+- Comparatio: $151,000 ÷ $184,857 = 0.82 (or 82%)
+
+### Interpretation
+- **< 80%**: Below market rate, potential flight risk
+- **80-90%**: Below midpoint, room for growth
+- **90-110%**: At market rate, well-positioned
+- **110-120%**: Above midpoint, experienced performer
+- **> 120%**: Premium pay, likely top performer
+
+The application uses comparatio values to:
+- Identify compensation equity issues
+- Suggest performance ratings based on pay positioning
+- Calculate appropriate raise recommendations
+- Flag employees who may be underpaid relative to their role
 
 ## 🎯 Key Features Explained
 
@@ -157,9 +194,11 @@ While optimized for desktop use, Team Analyzer provides:
 
 #### Data Validation Errors
 - **Duplicate employees**: Review and merge duplicate entries
-- **Invalid currencies**: Use standard 3-letter currency codes (USD, EUR, GBP)
+- **Invalid currencies**: Use standard 3-letter currency codes (USD, EUR, GBP, INR)
 - **Missing performance ratings**: Use the suggestion system or manually enter ratings
-- **Salary format**: Ensure salary amounts are numeric values
+- **Salary format**: Ensure salary amounts are numeric values (commas are automatically handled)
+- **Column mapping**: Ensure required columns match expected names (case-sensitive)
+- **Performance ratings**: Use supported rating text or numeric values (1-5)
 
 ### Getting Help
 - Press `?` key or click the help button for in-app documentation
